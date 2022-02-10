@@ -1,0 +1,20 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    Search
+{% endblock %}
+
+{% block body %}
+    <h1>Serach Results</h1>
+
+    <ul>
+        {% for entry in results %}
+            <li><a href="{% url 'encyclopedia:wiki' entry %}">{{ entry }}</a></li>
+        {% empty %}
+            <li>
+                Can't find any entries for query {{ query }}
+            </li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}

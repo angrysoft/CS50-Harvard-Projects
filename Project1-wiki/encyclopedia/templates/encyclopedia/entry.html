@@ -1,0 +1,22 @@
+{% extends "encyclopedia/layout.html" %}
+
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block body %}
+    {% if entry %}
+        <div class="edit">
+            <a href="{% url 'encyclopedia:edit' title %}">Edit Page </a>
+        </div>
+        <div class="page-entry">
+            {{ entry|safe }}
+        </div>
+    {% else %}
+        <div class="alert alert-danger" role="alert">
+            Sorry requested entry: {{ title }} does not exist
+        </div>
+        <a href="{% url 'encyclopedia:index' %}"><- Back To Page List</a>
+    {% endif %}
+{% endblock %}
