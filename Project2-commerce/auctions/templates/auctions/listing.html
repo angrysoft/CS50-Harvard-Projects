@@ -1,0 +1,70 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<article class="listing__details">
+    <div class="listing__header">
+        <h3>
+                Listing: {{ listing.title }}
+        </h3>
+        {% if user.is_authenticated %}
+            <a href="{% url 'watchlist-toggle' listing.pk %}?next={{ request.path|urlencode }}">
+                <span class="badge badge-secondary">
+                    Watchlist
+                </span>
+            </a>   
+        {% endif %}
+    </div>
+
+    <div class="image">
+        {% if listing.image %}
+        <img src="{{ listing.image }}" alt="">
+        {% else %}
+        <h3>No Photo</h3>
+        {% endif %}
+    </div>
+
+    <div class="listing__desc">
+        
+        <div class="desc">
+            {{ listing.description }}
+        </div>
+    </div>
+
+    <div class="bid">
+        <h3>$ {{ listing.start_bid }}</h3>
+
+        {% if user.is_authenticated %}
+        <form id="bid-form" action="/listing/{{ listing.pk }}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="input-bid">Bid Bid Bid</label>
+                <input class="form-control" type="number" name="input-bid" id="input-bid">
+            </div>
+            <div class="form-group">
+                <input class="btn btn-primary" type="submit" name="pace-bid" value="Place Bid">
+                {% if owner %}
+                <input class="btn btn-primary" type="submit" name="end-auction" value="End Auction">
+                {% endif %}
+            </div>
+        </form>
+        {% endif %}
+        
+        <div class="bid__details">
+            <h4>Details</h4>
+            <ul>
+                <li>Listed by: {{ listing.owner }}</li>
+                <li>Category:
+                    <ul>
+                        {% for category in categories %}
+                        <li><a href="{% url 'category' category.id %}">{{ category.name }}</a></li>
+                        {% empty %}
+                        <li>No categories</li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ul>
+        </div>   
+    </div>
+</article>
+    
+{% endblock %}
