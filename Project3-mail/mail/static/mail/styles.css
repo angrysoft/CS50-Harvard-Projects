@@ -1,0 +1,39 @@
+body {
+    font-size: 16px;
+}
+
+.views {
+    display: none;
+}
+
+.views.active-view {
+    display: block;
+}
+
+textarea {
+    min-height: 400px;
+}
+
+.list-group-item {
+    display: grid;
+    gap: 1rem;
+    align-items: center;
+    grid-template-columns: 1fr 5fr auto auto;
+    cursor: pointer;
+    background-color: rgb(212, 211, 211);
+}
+
+.list-group-item.unread {
+    font-weight: 700;
+    background-color: white;
+    color: black;
+}
+
+.list-group-item .sender {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.list-group-item .timestamp {
+    color: rgb(153, 153, 153);
+}
