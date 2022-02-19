@@ -28,7 +28,7 @@ class Listing(models.Model):
 
 
 class Bid(models.Model):
-    actual_price = models.BigIntegerField(default=0)
+    actual_price = models.BigIntegerField(default=0, verbose_name="Bid")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
 

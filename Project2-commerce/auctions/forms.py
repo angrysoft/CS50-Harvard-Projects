@@ -1,4 +1,3 @@
-
 from .models import Listing
 from django import forms
 
@@ -10,5 +9,10 @@ class ListingForm(forms.ModelForm):
         filter_horizonal = ["categories"]
 
 
-class ListingBidForm(forms.ModelForm):
-    pass
+class ListingBidForm(forms.Form):
+    actual_price = forms.IntegerField(
+        widget=forms.NumberInput(
+            attrs={"required": True, "class": "form-control", "label": "Bid"}
+        ),
+        label="Bids",
+    )

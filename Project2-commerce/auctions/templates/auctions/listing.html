@@ -37,8 +37,9 @@
         <form id="bid-form" action="/listing/{{ listing.pk }}" method="post">
             {% csrf_token %}
             <div class="form-group">
-                <label for="input-bid">Bid Bid Bid</label>
-                <input class="form-control" type="number" name="input-bid" id="input-bid">
+                {{ bid_form }}
+                <!-- <label for="input-bid">Bid Bid Bid</label>
+                <input class="form-control" type="number" name="input-bid" id="input-bid"> -->
             </div>
             <div class="form-group">
                 <input class="btn btn-primary" type="submit" name="pace-bid" value="Place Bid">

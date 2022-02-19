@@ -1,4 +1,3 @@
-from sys import flags
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
@@ -6,8 +5,8 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpRequest
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import Category, Listing, User, Watchlist
-from .forms import ListingForm
+from .models import Category, Listing, User, Watchlist, Bid
+from .forms import ListingBidForm, ListingForm
 
 
 def index(request: HttpRequest):
@@ -24,9 +23,21 @@ def index(request: HttpRequest):
     )
 
 
-def listing_details(request, list_id):
+def listing_details(request: HttpRequest, list_id: int):
     if request.method == "POST":
-        pass
+        form = ListingBidForm(request.POST)
+        if form.is_valid():
+            return HttpResponseRedirect(reverse("listing", args=[list_id]))
+    else:
+        form = ListingBidForm()
+        actual_bid = Bid.objects.filter(listing_id=list_id).order_by("-actual_price").first()
+        bids_count = Bid.objects.filter(listing_id=list_id).count()
+        last_bid_label = ""
+        if bids_count:
+            last_bid_label = f"Last bid by user {actual_bid.user} "
+        form.fields[
+            "actual_price"
+        ].label = f"{bids_count} bid(s) so far. {last_bid_label}"
 
     listing = Listing.objects.get(pk=list_id)
     user = None
@@ -41,6 +52,7 @@ def listing_details(request, list_id):
             "user": user,
             "owner": listing.owner == user,
             "categories": listing.categories.all(),
+            "bid_form": form,
         },
     )
 
