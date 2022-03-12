@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, HttpRequest
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import reverse
 
 from .models import Category, Listing, User, Watchlist, Bid
@@ -160,6 +160,16 @@ def create_listing(request: HttpRequest):
     )
 
 
+@login_required
+def end_auction(request: HttpRequest, list_id: int) -> HttpResponse:
+    if request.method == "POST":
+        listing = Listing.objects.get(pk=list_id)
+        listing.active = False
+        listing.save()
+
+    return HttpResponseRedirect(reverse("listing", args=[list_id]))
+
+
 def category(request: HttpRequest, category_id: int):
     _category = Category.objects.get(pk=category_id)
     listings = _category.listings.all()
@@ -176,3 +186,12 @@ def categories(request: HttpRequest):
     return render(
         request, "auctions/categories.html", {"categories": Category.objects.all()}
     )
+
+
+def comments(request: HttpRequest):
+    pass
+
+
+@login_required
+def add_comment(request: HttpRequest, list_id: int) -> HttpResponse:
+    pass

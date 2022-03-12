@@ -34,20 +34,25 @@
         <h3>$ {{ listing.start_bid }}</h3>
 
         {% if user.is_authenticated %}
+            {% if listing.active %}
         <form id="bid-form" action="/listing/{{ listing.pk }}" method="post">
             {% csrf_token %}
             <div class="form-group">
                 {{ bid_form }}
-                <!-- <label for="input-bid">Bid Bid Bid</label>
-                <input class="form-control" type="number" name="input-bid" id="input-bid"> -->
             </div>
             <div class="form-group">
                 <input class="btn btn-primary" type="submit" name="pace-bid" value="Place Bid">
-                {% if owner %}
-                <input class="btn btn-primary" type="submit" name="end-auction" value="End Auction">
-                {% endif %}
             </div>
         </form>
+            {% if owner %}
+        <form action="/listing/end/{{ listing.pk }}" id="end-form" method="post">
+            {% csrf_token %}
+            <input class="btn btn-primary" type="submit" name="end-auction" value="End Auction">
+        </form>
+            {% endif %}
+            {% else %}
+
+            {% endif %}
         {% endif %}
         
         <div class="bid__details">
@@ -64,7 +69,23 @@
                     </ul>
                 </li>
             </ul>
-        </div>   
+        </div> 
+        <hr />
+        <div id="comments">
+            <h3>Comments</h3>
+        {% if user.is_authenticated %}
+        <form action="/comments/add/{{ listing.pk }}" id="add-comment" >
+            {% csrf_token %}
+            {{ comment_form }}
+        </form>
+        {% endif %}
+            {% for comment in comments %}
+            <article class="comment">
+                <h4>{{ comment.user}} Write: </h4>
+                <p>comment.text</p>
+            </article>
+            {% endfor %}
+        </div> 
     </div>
 </article>
     
