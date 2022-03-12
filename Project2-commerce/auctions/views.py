@@ -2,10 +2,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, HttpRequest
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
-from .models import Category, Listing, User, Watchlist, Bid
+from .models import Category, Listing, User, Watchlist, Bid, Comment
 from .forms import ListingBidForm, ListingForm
 
 
@@ -24,37 +24,45 @@ def index(request: HttpRequest):
 
 
 def listing_details(request: HttpRequest, list_id: int):
+    actual_bid = (
+        Bid.objects.filter(listing_id=list_id).order_by("-actual_price").first()
+    )
     if request.method == "POST":
         form = ListingBidForm(request.POST)
         if form.is_valid():
-            return HttpResponseRedirect(reverse("listing", args=[list_id]))
+            if form.cleaned_data.get("bid_price") > actual_bid:
+                new_bid = Bid()
+                new_bid.bid_price = form.cleaned_data.get("bid_price")
+                new_bid.save()
+
+        return HttpResponseRedirect(reverse("listing", args=[list_id]))
     else:
+        listing = get_object_or_404(Listing, pk=list_id)
         form = ListingBidForm()
-        actual_bid = Bid.objects.filter(listing_id=list_id).order_by("-actual_price").first()
-        bids_count = Bid.objects.filter(listing_id=list_id).count()
+        bids_count = listing.bid_set.count()
         last_bid_label = ""
         if bids_count:
             last_bid_label = f"Last bid by user {actual_bid.user} "
         form.fields[
-            "actual_price"
+            "bid_price"
         ].label = f"{bids_count} bid(s) so far. {last_bid_label}"
 
-    listing = Listing.objects.get(pk=list_id)
-    user = None
-    if request.user.id:
-        user = User.objects.get(pk=request.user.id)
+        user = None
+        if request.user.id:
+            user = User.objects.get(pk=request.user.id)
 
-    return render(
-        request,
-        "auctions/listing.html",
-        {
-            "listing": listing,
-            "user": user,
-            "owner": listing.owner == user,
-            "categories": listing.categories.all(),
-            "bid_form": form,
-        },
-    )
+        return render(
+            request,
+            "auctions/listing.html",
+            {
+                "listing": listing,
+                "user": user,
+                "owner": listing.owner == user,
+                "categories": listing.categories.all(),
+                "bid_form": form,
+                "comments": listing.comment_set.all(),
+            },
+        )
 
 
 @login_required

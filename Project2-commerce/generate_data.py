@@ -22,7 +22,5 @@ for i in range(15):
     listing.owner = User.objects.get(username__exact="test")
     listing.start_bid = randint(0, 10000)
     listing.save()
-    listing.categories.add(
-        Category.objects.get(name__exact=categories[randint(0, 4)])
-    )
+    listing.categories.add(Category.objects.get(name__exact=categories[randint(0, 4)]))
     print(f"Added Title {i}")

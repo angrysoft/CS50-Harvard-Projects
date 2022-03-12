@@ -1,4 +1,3 @@
-from pyexpat import model
 from .models import Comment, Listing
 from django import forms
 
@@ -11,7 +10,7 @@ class ListingForm(forms.ModelForm):
 
 
 class ListingBidForm(forms.Form):
-    actual_price = forms.IntegerField(
+    bid_price = forms.IntegerField(
         widget=forms.NumberInput(
             attrs={"required": True, "class": "form-control", "label": "Bid"}
         ),

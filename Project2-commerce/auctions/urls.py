@@ -20,6 +20,4 @@ urlpatterns = [
     ),
     path("listing/end/<int:list_id>", views.end_auction, name="end_auction"),
     path("comments/add/<int:list_id>", views.add_comment, name="add_comment"),
-    path("comments/", views.end_auction, name="end_auction")
-
 ]
