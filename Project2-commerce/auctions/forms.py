@@ -1,4 +1,5 @@
-from .models import Listing
+from pyexpat import model
+from .models import Comment, Listing
 from django import forms
 
 
@@ -16,3 +17,8 @@ class ListingBidForm(forms.Form):
         ),
         label="Bids",
     )
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model: Comment
