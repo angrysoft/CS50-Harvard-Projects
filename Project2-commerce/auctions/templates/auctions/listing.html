@@ -31,7 +31,7 @@
     </div>
 
     <div class="bid">
-        <h3>$ {{ listing.start_bid }}</h3>
+        <h3>$ {{ actual_price }}</h3>
 
         {% if user.is_authenticated %}
             {% if listing.active %}
@@ -74,15 +74,17 @@
         <div id="comments">
             <h3>Comments</h3>
         {% if user.is_authenticated %}
-        <form action="/comments/add/{{ listing.pk }}" id="add-comment" >
+        <form action="/comments/add/{{ listing.pk }}" id="add-comment" method="post">
             {% csrf_token %}
             {{ comment_form }}
+            <input class="btn btn-primary" type="submit" name="add-comment" value="Add Comment">
         </form>
         {% endif %}
             {% for comment in comments %}
             <article class="comment">
-                <h4>{{ comment.user}} Write: </h4>
-                <p>comment.text</p>
+                <h4>{{ comment.autor}}</h4>
+                <h6>{{ comment.added }}</h6>
+                <p>{{ comment.text }}</p>
             </article>
             {% endfor %}
         </div> 

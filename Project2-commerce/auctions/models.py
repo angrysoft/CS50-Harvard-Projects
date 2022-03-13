@@ -40,6 +40,8 @@ class Comment(models.Model):
     autor = models.ForeignKey(User, on_delete=models.SET("Deleted"))
     text = models.TextField()
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
+    added = models.DateTimeField(auto_now=True, auto_created=True, editable=False)
+
 
 
 class Watchlist(models.Model):

@@ -1,3 +1,4 @@
+from typing import List
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
@@ -6,7 +7,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
 from .models import Category, Listing, User, Watchlist, Bid, Comment
-from .forms import ListingBidForm, ListingForm
+from .forms import CommentForm, ListingBidForm, ListingForm
 
 
 def index(request: HttpRequest):
@@ -27,17 +28,21 @@ def listing_details(request: HttpRequest, list_id: int):
     actual_bid = (
         Bid.objects.filter(listing_id=list_id).order_by("-actual_price").first()
     )
+    listing = get_object_or_404(Listing, pk=list_id)
     if request.method == "POST":
         form = ListingBidForm(request.POST)
         if form.is_valid():
-            if form.cleaned_data.get("bid_price") > actual_bid:
+            bid_price: int  = form.cleaned_data.get("bid_price", 0)
+            if (not actual_bid and listing.start_bid <= bid_price) or actual_bid.actual_price < bid_price:
+                print(bid_price)
                 new_bid = Bid()
-                new_bid.bid_price = form.cleaned_data.get("bid_price")
+                new_bid.actual_price = bid_price
+                new_bid.user = User.objects.get(pk=request.user.id)
+                new_bid.listing = listing
                 new_bid.save()
 
         return HttpResponseRedirect(reverse("listing", args=[list_id]))
     else:
-        listing = get_object_or_404(Listing, pk=list_id)
         form = ListingBidForm()
         bids_count = listing.bid_set.count()
         last_bid_label = ""
@@ -50,7 +55,10 @@ def listing_details(request: HttpRequest, list_id: int):
         user = None
         if request.user.id:
             user = User.objects.get(pk=request.user.id)
-
+        
+        actual_price = listing.start_bid
+        if bids_count:
+            actual_price = listing.bid_set.order_by("-actual_price").first()
         return render(
             request,
             "auctions/listing.html",
@@ -60,7 +68,9 @@ def listing_details(request: HttpRequest, list_id: int):
                 "owner": listing.owner == user,
                 "categories": listing.categories.all(),
                 "bid_form": form,
-                "comments": listing.comment_set.all(),
+                "actual_price": actual_price,
+                "comments": listing.comment_set.all().order_by("-added"),
+                "comment_form": CommentForm()
             },
         )
 
@@ -172,8 +182,9 @@ def create_listing(request: HttpRequest):
 def end_auction(request: HttpRequest, list_id: int) -> HttpResponse:
     if request.method == "POST":
         listing = Listing.objects.get(pk=list_id)
-        listing.active = False
-        listing.save()
+        if (request.user.id == listing.owner.id):
+            listing.active = False
+            listing.save()
 
     return HttpResponseRedirect(reverse("listing", args=[list_id]))
 
@@ -196,10 +207,13 @@ def categories(request: HttpRequest):
     )
 
 
-def comments(request: HttpRequest):
-    pass
-
-
 @login_required
 def add_comment(request: HttpRequest, list_id: int) -> HttpResponse:
-    pass
+    if request.method == "POST":
+        comment_obj = Comment()
+        comment_obj.autor = User.objects.get(pk=request.user.id)
+        comment_obj.listing = Listing.objects.get(pk=list_id)
+        comment = CommentForm(request.POST, instance=comment_obj)
+        if comment.is_valid():
+            comment.save()
+    return HttpResponseRedirect(reverse("listing", args=[list_id]))

@@ -20,4 +20,5 @@ class ListingBidForm(forms.Form):
 
 class CommentForm(forms.ModelForm):
     class Meta:
-        model: Comment
+        model = Comment
+        fields = ["text"]

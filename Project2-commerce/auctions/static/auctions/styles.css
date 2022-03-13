@@ -101,10 +101,43 @@ body {
     color: rgb(114, 114, 114);
 }
 
-#bid-form {
+#bid-form,
+#add-comment {
     display: grid;
-    grid-template-columns: auto;
     gap: 1rem;
+}
+
+#bid-form {
+    grid-template-columns: auto;
     justify-content: left;
  }
 
+ #add-comment {
+     grid-template-columns: 1fr;
+     justify-content: center;
+ }
+
+ #add-comment > * {
+     width: 100%;
+ }
+
+.comments {
+    display: flex;
+}
+
+.comment {
+    padding: 1rem 2rem;
+    margin: 1rem 0;
+    border-radius: 0.1rem;
+    box-shadow: 0 0 4px 0px rgba(0, 0, 0, 0.3);
+    transition: box-shadow 0.5s;
+}
+
+.comment:hover {
+    box-shadow: 2px 2px 8px 0px rgba(0, 0, 0, 0.5);
+}
+
+.comment h6 {
+    margin-bottom: 1rem;
+    color: rgb(138, 138, 138);
+}
