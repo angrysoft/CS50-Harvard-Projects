@@ -25,54 +25,57 @@ def index(request: HttpRequest):
 
 
 def listing_details(request: HttpRequest, list_id: int):
-    actual_bid = (
-        Bid.objects.filter(listing_id=list_id).order_by("-actual_price").first()
-    )
     listing = get_object_or_404(Listing, pk=list_id)
+    actual_bid = listing.bid_set.order_by("-actual_price").first()
+
     if request.method == "POST":
         form = ListingBidForm(request.POST)
         if form.is_valid():
-            bid_price: int  = form.cleaned_data.get("bid_price", 0)
-            if (not actual_bid and listing.start_bid <= bid_price) or actual_bid.actual_price < bid_price:
-                print(bid_price)
+            bid_price: int = form.cleaned_data.get("bid_price", 0)
+            if (not actual_bid and listing.start_bid <= bid_price) or (
+                actual_bid and actual_bid.actual_price < bid_price
+            ):
                 new_bid = Bid()
                 new_bid.actual_price = bid_price
                 new_bid.user = User.objects.get(pk=request.user.id)
                 new_bid.listing = listing
                 new_bid.save()
+                return HttpResponseRedirect(reverse("listing", args=[list_id]))
+            else:
+                form.add_error("bid_price", "Declared Bid is to small")
 
-        return HttpResponseRedirect(reverse("listing", args=[list_id]))
     else:
         form = ListingBidForm()
-        bids_count = listing.bid_set.count()
-        last_bid_label = ""
-        if bids_count:
-            last_bid_label = f"Last bid by user {actual_bid.user} "
-        form.fields[
-            "bid_price"
-        ].label = f"{bids_count} bid(s) so far. {last_bid_label}"
 
-        user = None
-        if request.user.id:
-            user = User.objects.get(pk=request.user.id)
-        
-        actual_price = listing.start_bid
-        if bids_count:
-            actual_price = listing.bid_set.order_by("-actual_price").first()
-        return render(
-            request,
-            "auctions/listing.html",
-            {
-                "listing": listing,
-                "user": user,
-                "owner": listing.owner == user,
-                "categories": listing.categories.all(),
-                "bid_form": form,
-                "actual_price": actual_price,
-                "comments": listing.comment_set.all().order_by("-added"),
-                "comment_form": CommentForm()
-            },
-        )
+    user = None
+    if request.user.id:
+        user = User.objects.get(pk=request.user.id)
+
+
+    bids_count = listing.bid_set.count()
+    last_bid_label = ""
+    if bids_count:
+        last_bid_label = f"Last bid by user {actual_bid.user} "
+    form.fields["bid_price"].label = f"{bids_count} bid(s) so far. {last_bid_label}"
+
+    actual_price = listing.start_bid
+    if bids_count:
+        actual_price = actual_bid
+
+    return render(
+        request,
+        "auctions/listing.html",
+        {
+            "listing": listing,
+            "user": user,
+            "owner": listing.owner == user,
+            "categories": listing.categories.all(),
+            "bid_form": form,
+            "actual_price": actual_price,
+            "comments": listing.comment_set.all().order_by("-added"),
+            "comment_form": CommentForm(),
+        },
+    )
 
 
 @login_required
@@ -182,7 +185,7 @@ def create_listing(request: HttpRequest):
 def end_auction(request: HttpRequest, list_id: int) -> HttpResponse:
     if request.method == "POST":
         listing = Listing.objects.get(pk=list_id)
-        if (request.user.id == listing.owner.id):
+        if request.user.id == listing.owner.id:
             listing.active = False
             listing.save()
 

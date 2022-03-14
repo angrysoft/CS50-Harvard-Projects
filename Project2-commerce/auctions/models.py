@@ -43,7 +43,6 @@ class Comment(models.Model):
     added = models.DateTimeField(auto_now=True, auto_created=True, editable=False)
 
 
-
 class Watchlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE)

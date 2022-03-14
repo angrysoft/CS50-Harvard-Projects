@@ -141,3 +141,7 @@ body {
     margin-bottom: 1rem;
     color: rgb(138, 138, 138);
 }
+
+.errorlist {
+    color: red;
+}
