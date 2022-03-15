@@ -54,13 +54,15 @@ def listing_details(request: HttpRequest, list_id: int):
 
     bids_count = listing.bid_set.count()
     last_bid_label = ""
+    last_bid_user = "Unknown"
     if bids_count:
+        last_bid_user = actual_bid.user
         last_bid_label = f"Last bid by user {actual_bid.user} "
     form.fields["bid_price"].label = f"{bids_count} bid(s) so far. {last_bid_label}"
 
     actual_price = listing.start_bid
     if bids_count:
-        actual_price = actual_bid
+        actual_price = actual_bid.actual_price
 
     return render(
         request,
@@ -71,6 +73,7 @@ def listing_details(request: HttpRequest, list_id: int):
             "owner": listing.owner == user,
             "categories": listing.categories.all(),
             "bid_form": form,
+            "last_bid_user": last_bid_user,
             "actual_price": actual_price,
             "comments": listing.comment_set.all().order_by("-added"),
             "comment_form": CommentForm(),
