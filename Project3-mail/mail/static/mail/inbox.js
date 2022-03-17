@@ -5,18 +5,30 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
   document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
   document.querySelector('#compose').addEventListener('click', compose_email);
-
+  document.querySelector("#compose-form").addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const [msg, code] = await callApi('/emails', "POST", {
+      recipients: document.querySelector('#compose-recipients').value,
+      subject: document.querySelector('#compose-subject').value,
+      body: document.querySelector('#compose-body').value
+    });
+    if (code === 201) {
+      load_mailbox('sent');
+    } else {
+      alert(msg["error"]);
+    }
+  });
   // By default, load the inbox
   load_mailbox('inbox');
 });
 
-function compose_email() {
+async function compose_email(recipients = "", subject= "", body = "") {
   switchView('#compose-view', "COMPOSE");
 
   // Clear out composition fields
-  document.querySelector('#compose-recipients').value = '';
-  document.querySelector('#compose-subject').value = '';
-  document.querySelector('#compose-body').value = '';
+  document.querySelector('#compose-recipients').value = recipients;
+  document.querySelector('#compose-subject').value = subject;
+  document.querySelector('#compose-body').value = body;
 }
 
 const switchView = (viewId, title)=> {
@@ -34,7 +46,7 @@ async function load_mailbox(mailbox) {
 
   // Show the mailbox name
   inbox.innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
-  const mailList = await apiGet(`/emails/${mailbox}`);
+  const [mailList] = await callApi(`/emails/${mailbox}`);
   const listView = document.createElement("ul");
   listView.className = "list-group";
   listView.id = "mailbox";
@@ -49,8 +61,8 @@ async function load_mailbox(mailbox) {
         let button = "<span></span>";
         if (mailbox === 'inbox') {
           button = '<button class="btn btn-sm btn-outline-primary" data-action="archive">Archive</button>';
-        } else if (mailbox === 'archived') {
-          button = '<button class="btn btn-sm btn-outline-primary" data-action="archive">Archive</button>'
+        } else if (mailbox === 'archive') {
+          button = '<button class="btn btn-sm btn-outline-primary" data-action="unarchive">Unarchive</button>'
         }
 
       
@@ -80,9 +92,16 @@ async function load_mailbox(mailbox) {
   });
 }
 
-const toggleArchive = (mailId, action) => {
-  let archive = action === "archive" ? true : false;
-  console.log(mailId, action, archive);
+const toggleArchive = async (mailId, action) => {
+  let archived = action === "archive" ? true : false;
+  const [msg, code] = await callApi(`/emails/${mailId}`, "PUT", {
+    archived: archived
+  });
+  if (code === 204) {
+    load_mailbox('inbox');
+  } else {
+    alert(msg["error"]);
+  }
 }
 
 const loadMailView = async (mailId) => {
@@ -90,7 +109,7 @@ const loadMailView = async (mailId) => {
     return;
 
   switchView("#email-details-view", "MAIL");
-  const mailData = await apiGet(`/emails/${mailId}`);
+  const [mailData] = await callApi(`/emails/${mailId}`);
   if (mailData) {
     const mailView = document.querySelector("#email-details-view");
     mailView.innerHTML = `
@@ -118,24 +137,33 @@ const loadMailView = async (mailId) => {
       ${mailData.body}
     </div>
     `
-    putApi(`/emails/${mailId}`, {
+    let btn = document.getElementById("Replay");
+    btn.removeEventListener('click', ()=> {replayMail(mailData)});
+    btn.addEventListener('click', ()=> {replayMail(mailData)});
+
+    await callApi(`/emails/${mailId}`, "PUT", {
       read: true
     });
   }
   
 }
-const apiGet = async (url) => {
-  let response = await fetch(`${url}`);
-  if (response.ok) {
-    return response.json()
-  } else {
-    return null
-  }
-};
 
-const putApi = async (url, data) => {
-  fetch(url, {
-    method: 'PUT',
-    body: JSON.stringify(data)
-  });
+const replayMail = (mailData) => {
+  console.log(mailData);
+  // compose_email(mailData.recipients)
+}
+
+const callApi = async (url, method = "GET", data = {}) => {
+  let args = { method: method } 
+  if (["POST", "PUT"].includes(method)) {
+      args["body"] = JSON.stringify(data)
+  }
+
+  let response = await fetch(url, args);
+  try {
+    let ret = await response.json();
+    return [await ret, response.status];
+  } catch(e) {
+    return [{error: e.toString()}, response.status];
+  }
 }
