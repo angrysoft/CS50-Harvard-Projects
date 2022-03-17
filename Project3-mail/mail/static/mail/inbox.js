@@ -150,7 +150,7 @@ const loadMailView = async (mailId) => {
 
 const replayMail = (mailData) => {
   console.log(mailData);
-  // compose_email(mailData.recipients)
+  // compose_email(mailData , .recipients)
 }
 
 const callApi = async (url, method = "GET", data = {}) => {
