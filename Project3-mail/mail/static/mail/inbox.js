@@ -150,7 +150,21 @@ const loadMailView = async (mailId) => {
 
 const replayMail = (mailData) => {
   console.log(mailData);
-  // compose_email(mailData , .recipients)
+  const sender = mailData.sender;
+  let  subjectPrefix = "Re: ";
+  if (mailData.subject.startsWith("Re:")) {
+    subjectPrefix = "";
+  }
+  const subject = `${subjectPrefix}${mailData.subject}`;
+  let body = `On ${mailData.timestamp} ${sender} wrote:\n`;
+  mailData.body.split("\n").forEach((line)=> {
+    body += `  > ${line}`;
+  });
+  compose_email(
+    sender,
+    subject,
+    body
+    );
 }
 
 const callApi = async (url, method = "GET", data = {}) => {
