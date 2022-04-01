@@ -7,5 +7,23 @@ class User(AbstractUser):
 
 
 class Post(models.Model):
-    text = models.TextField(verbose_name="New Post")
-    added = models.DateTimeField(auto_now=True, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="PostUser")
+    content = models.TextField()
+    edited = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return f"{self.user}-({self.pk})"
+
+
+class Likes(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="LiskesUsesr")
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="LikedPost")
+
+
+class Fallowing(models.Model):
+    fallower = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="Fallower"
+    )
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="FallowingUser"
+    )

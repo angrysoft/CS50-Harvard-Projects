@@ -5,16 +5,16 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
-from network.forms import PostFrom
-
+from network.forms import NewPostForm
 
 from .models import User, Post
 
 
 def index(request):
-    posts = Post.objects.order_by("-added").all()
+    post_form = NewPostForm()
+    posts = Post.objects.order_by("-edited").all()
     return render(
-        request, "network/index.html", {"posts": posts, "post_form": PostFrom}
+        request, "network/index.html", {"new_post_form": post_form, "posts": posts}
     )
 
 

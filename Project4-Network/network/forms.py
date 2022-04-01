@@ -1,12 +1,8 @@
-from cProfile import label
-from attr import fields
 from django import forms
 
 
-class PostFrom(forms.Form):
-    text = forms.CharField(
-        widget=forms.Textarea(
-            attrs={"required": True, "class": "form-control"}
-        ),
+class NewPostForm(forms.Form):
+    content = forms.CharField(
+        widget=forms.Textarea(attrs={"class": "new-post form-control"}),
         label="New Post",
     )
