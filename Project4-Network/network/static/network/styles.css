@@ -1,0 +1,21 @@
+html {
+    --border-radius: 3px;
+    --border: 1px solid #ced4da;
+}
+
+.posts {
+    display: grid;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+#new-post {
+    padding: 2rem;
+    border: var(--border);
+    border-radius: var(--border-radius);
+}
+
+#new-post label {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
