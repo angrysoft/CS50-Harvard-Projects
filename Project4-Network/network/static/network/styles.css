@@ -1,7 +1,16 @@
+html {
+    --border: 1px solid rgb(109, 109, 109);
+    --radius: 3px;
+}
+
 body {
     margin: 0;
     padding: 0;
     font-size: 16px;
+}
+
+.navbar {
+    padding: 1rem;
 }
 
 .all-posts {
@@ -10,10 +19,13 @@ body {
     padding: 1rem;
 }
 
-.new-post-form {
+.new-post-form,
+.post,
+.user-data {
     padding: 1rem;
-    border: 1px solid rgb(109, 109, 109);
-    border-radius: 3px;
+    border: var(--border);
+    border-radius: var(--radius);
+    border-collapse: collapse;
 }
 
 .new-post-form label {
@@ -24,9 +36,19 @@ body {
     display: grid;
     gap: 1rem;
     grid-template-columns: 1fr;
+    padding: 1rem;
 }
 
 .post-pagination {
     display: flex;
     justify-content: center;
+}
+
+.user-profile {
+    padding: 1rem;
+}
+
+.user-data {
+    display: grid;
+    gap: 0.5rem;
 }

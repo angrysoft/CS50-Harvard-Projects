@@ -1,0 +1,50 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+
+    {% block before_posts %}
+    {% endblock %}
+
+    {% block posts %}
+    <div class="post-list">
+        {% for post in posts_page.object_list %}
+            <article class="post">
+                <a href="/profile/{{ post.user }}"><h3>{{ post.user }}</h3></a>
+                <div class="post__content">
+                    <p>{{ post.content }}</p>
+                    <time>{{ post.edited }}</time>
+                    <span class="like__icon">&#9829;</span>
+                    <span class="like__number">likes</span>
+                </div>
+                <div class="post__comments">
+                    comments
+                </div>
+            </article>
+        {% endfor %}
+        </div>
+        <div class="post-pagination">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    {% if posts_page.has_previous %}  
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ posts_page.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% for item in page_list %}
+                    <li class="page-item"><a class="page-link" href="?page={{ item }}">{{ item }}</a></li>
+                    {% endfor %}
+                    {% if posts_page.has_next %}
+                    <li class="page-item">
+                    <a class="page-link" href="page={{ posts_page.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    {% endblock %}
+
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "network/post_list.html" %}
+
+{% block before_posts %}
+<div class="user-profile">
+    <div class="user-data">
+        <div>
+            <h3>{{ profile.username }}</h3>
+            {% if user.id != profile.id %}
+            <button class="btn btn-primary">
+                fallow
+            </button>
+            {% endif %}
+        </div>
+        <h5>followers <span class="badge bg-primary">000</span></h5>
+        <h5>follows <span class="badge bg-primary">0</span></h5>
+        <span class="badge badge-primary">Primary</span>
+    </div>
+</div>
+{% endblock %}
