@@ -12,10 +12,15 @@
                 fallow
             </button>
             {% endif %}
-            <h5>followers <span class="badge bg-primary">000</span></h5>
-            <h5>follows <span class="badge bg-primary">0</span></h5>
+            <h5>followers <span class="badge bg-primary">{{ profile.FallowingUser.count }}</span></h5>
+            <h5>follows <span class="badge bg-primary">{{ profile.Follower.count }}</span></h5>
             <span class="badge badge-primary">Primary</span>
         </div>
     </div>
 </div>
+{% endblock %}
+
+
+{% block posts %}
+<post-list user="{{ profile.username }}"></post-list>
 {% endblock %}

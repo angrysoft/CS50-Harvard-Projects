@@ -4,7 +4,11 @@ from django.db import models
 
 
 class User(AbstractUser):
-    pass
+    def serialize(self) -> Dict[str, Any]:
+        return {
+            "username": self.username,
+            "authenticated": self.is_authenticated,
+        }
 
 
 class Post(models.Model):
@@ -14,9 +18,9 @@ class Post(models.Model):
 
     def serialize(self) -> Dict[str, Any]:
         return {
-            "user": self.user,
+            "user": self.user.username,
             "content": self.content,
-            "edited": self.edited
+            "edited": self.edited,
         }
 
     def __str__(self) -> str:
@@ -30,7 +34,7 @@ class Likes(models.Model):
 
 class Fallowing(models.Model):
     fallower = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="Fallower"
+        User, on_delete=models.CASCADE, related_name="Follower"
     )
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="FallowingUser"
