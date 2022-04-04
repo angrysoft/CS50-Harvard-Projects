@@ -4,7 +4,7 @@
     <div class="all-posts">
         <h1>All Posts</h1>
         {% if user.is_authenticated %}
-        <form class="new-post-form">
+        <form class="new-post-form" action="/posts", method="post">
             {% csrf_token %}
             <div class="mb-3">
                 {{ new_post_form }}
@@ -15,4 +15,13 @@
         </form>
         {% endif %}
     </div>
+{% endblock %}
+
+{% block posts %}
+<div id="posts" class="post-list">
+    <div class="d-flex align-items-center">
+        <strong>Loading...  </strong>
+        <div class="spinner-border" role="status" aria-hidden="true"></div>
+    </div>
+</div>
 {% endblock %}

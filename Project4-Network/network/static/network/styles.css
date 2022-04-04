@@ -35,7 +35,7 @@ body {
 .post-list {
     display: grid;
     gap: 1rem;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fit,minmax(22rem,1fr));
     padding: 1rem;
 }
 
@@ -45,7 +45,9 @@ body {
 }
 
 .user-profile {
-    padding: 1rem;
+    display: grid;
+    justify-content: center;
+    padding: 2rem;
 }
 
 .user-data {

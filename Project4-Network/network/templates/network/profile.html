@@ -2,18 +2,20 @@
 
 {% block before_posts %}
 <div class="user-profile">
-    <div class="user-data">
-        <div>
-            <h3>{{ profile.username }}</h3>
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">{{ profile.username }}</h5>
+        </div>
+        <div class="card-body">
             {% if user.id != profile.id %}
             <button class="btn btn-primary">
                 fallow
             </button>
             {% endif %}
+            <h5>followers <span class="badge bg-primary">000</span></h5>
+            <h5>follows <span class="badge bg-primary">0</span></h5>
+            <span class="badge badge-primary">Primary</span>
         </div>
-        <h5>followers <span class="badge bg-primary">000</span></h5>
-        <h5>follows <span class="badge bg-primary">0</span></h5>
-        <span class="badge badge-primary">Primary</span>
     </div>
 </div>
 {% endblock %}
