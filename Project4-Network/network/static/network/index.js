@@ -6,6 +6,7 @@ class PostList extends HTMLElement {
         this.user = "";
         this.page = 1;
         this.data = {}
+        this.handlePageChange = this.handlePageChange.bind(this);
     }
     
     static get observedAttributes() { return ['user', 'page']; }
@@ -16,7 +17,7 @@ class PostList extends HTMLElement {
                 this.user = newValue;
                 break;
             
-                case "page":
+            case "page":
                 this.page = newValue;
                 await this.render();
                 break;
@@ -26,7 +27,7 @@ class PostList extends HTMLElement {
     async getData() {
         let url = "/posts";
         if (this.user)
-        url += `/${this.user}`;
+            url += `/${this.user}`;
         const response = await fetch(url);
         if (response.ok) {
             this.data = await response.json();
@@ -35,6 +36,7 @@ class PostList extends HTMLElement {
     }
     
     handlePageChange(page) {
+        console.log(page, this.getAttribute("page"));
         this.setAttribute("page", page);
     }
     
@@ -51,7 +53,7 @@ class PostList extends HTMLElement {
         });
 
         this.appendChild(this.postsWrapper);
-        this.appendChild(new PagePagination(this.data.paginator), this.handlePageChange);
+        this.appendChild(new PagePagination(this.data.paginator, this.handlePageChange));
     }
 }
 
@@ -92,10 +94,8 @@ class PagePagination extends HTMLElement {
     connectedCallback() {
         this.addEventListener("click", (el) => {
             el.preventDefault();
-            console.log(el)
-            if (el.target.dataset.page)
-                console.log(el.target.dataset.page);
-                this.pageChange(el.target.dataset.page);
+            if (el.target.hasAttribute("data-page"))
+                this.pageChange(el.target.getAttribute("data-page"));
         });
 
         this.render();
