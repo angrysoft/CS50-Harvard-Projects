@@ -1,3 +1,4 @@
+import json
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
@@ -55,12 +56,11 @@ class Posts(View):
 
     @method_decorator(login_required)
     def post(self, request: HttpRequest):
+        data = json.loads(request.body)
         post = Post()
-        post.content = request.POST.get("content")
+        post.content = data.get("content")
         post.user = User.objects.get(pk=request.user.id)
         post.save()
-        if next := request.POST.get("next"):
-            return HttpResponseRedirect(next)
         return HttpResponse("ok")
 
     @method_decorator(login_required)

@@ -4,15 +4,7 @@
     <div class="all-posts">
         <h1>All Posts</h1>
         {% if user.is_authenticated %}
-        <form class="new-post-form" action="/posts", method="post">
-            {% csrf_token %}
-            <div class="mb-3">
-                {{ new_post_form }}
-            </div>
-            <div class="mb-3">
-                <input type="submit" class="btn btn-primary" value="Post">
-            </div>
-        </form>
+        <post-form></post-form>
         {% endif %}
     </div>
 {% endblock %}
