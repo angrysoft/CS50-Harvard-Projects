@@ -1,4 +1,5 @@
 import json
+import re
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
@@ -12,24 +13,33 @@ from django.core.exceptions import PermissionDenied
 
 from network.forms import NewPostForm
 
-from .models import User, Post
+from .models import User, Post, Following
 
 
 class Posts(View):
-    def get(self, request: HttpRequest, username: str | None = None):
-        posts = Post.objects.order_by("-edited")
-        if username:
-            posts = posts.filter(user__username__exact=username)
-
+    def get(
+        self,
+        request: HttpRequest,
+        filter_name: str | None = None,
+        filter_arg: str | None = None,
+    ):
+        user_id: int = request.user.id
         page_no: int = int(request.GET.get("page", 1))
-        paginator = Paginator(posts.all(), per_page=10, allow_empty_first_page=True)
+        posts = self.getPosts(request, filter_name, filter_arg)
+        items: int = int(request.GET.get("items", 10))
+        results = self.getResults(posts, user_id, page_no, items)
+
+        return JsonResponse(results)
+
+    def getResults(self, posts, user_id, page_no, items):
+        paginator = Paginator(posts.all(), per_page=items, allow_empty_first_page=True)
         current_page: Page = paginator.get_page(page_no)
         results = {}
         results["results"] = []
         for post in current_page.object_list:
             current_post = post.serialize()
             current_post["likes"] = post.LikedPost.count()
-            current_post["owner"] = post.user.id == request.user.id
+            current_post["owner"] = post.user.id == user_id
             results["results"].append(current_post)
 
         results["paginator"] = {
@@ -52,8 +62,20 @@ class Posts(View):
             results["paginator"]["next_page_number"] = current_page.next_page_number()
         except InvalidPage:
             pass
+        return results
 
-        return JsonResponse(results)
+    def getPosts(self, request, filter_name, filter_arg):
+        posts = Post.objects.order_by("-edited")
+        if filter_name == "username":
+            posts = posts.filter(user__username__exact=filter_arg)
+        elif filter_name == "following":
+            if not request.user.is_authenticated:
+                raise PermissionDenied
+
+            user = User.objects.get(pk=request.user.id)
+            following_users = [f.user for f in user.Follower.all()]
+            posts = posts.filter(user__username__in=following_users)
+        return posts
 
     @method_decorator(login_required)
     def post(self, request: HttpRequest):
@@ -71,6 +93,10 @@ class Posts(View):
         if user != post.user:
             raise PermissionDenied
 
+        data = json.loads(request.body)
+        post.content = data.get("content", "")
+        post.save()
+
 
 def index(request: HttpRequest):
     return render(
@@ -82,7 +108,7 @@ def index(request: HttpRequest):
     )
 
 
-def user_profile(request, username: str):
+def user_profile(request: HttpRequest, username: str):
     user_profile = User.objects.get(username__exact=username)
     return render(
         request,
@@ -91,6 +117,23 @@ def user_profile(request, username: str):
             "profile": user_profile,
         },
     )
+
+
+class Following(View):
+    @method_decorator(login_required)
+    def get(self, request: HttpRequest):
+        return render(request, "network/following.html")
+
+    @method_decorator(login_required)
+    def post(self, request: HttpRequest, following_username: str):
+        user = get_object_or_404(User, pk=request.user.id)
+        following_user = get_object_or_404(User, username=following_username)
+        following_users = [f.user for f in user.Follower.all()]
+        if following_username in following_users:
+            Following.objec
+        following = Following()
+        following.fallower = user
+        following.user = following_user
 
 
 def login_view(request: HttpRequest):

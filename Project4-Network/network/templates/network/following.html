@@ -1,0 +1,11 @@
+{% extends "network/post_list.html" %}
+
+{% block before_posts %}
+    <div class="all-posts">
+        <h1>Following Users Posts</h1>
+    </div>
+{% endblock %}
+
+{% block posts %}
+<post-list filter="following" filterarg="{{ user.username }}" items="15"></post-list>
+{% endblock %}

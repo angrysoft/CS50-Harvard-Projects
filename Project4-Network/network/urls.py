@@ -9,5 +9,13 @@ urlpatterns = [
     path("register", views.register, name="register"),
     path("profile/<str:username>", views.user_profile, name="profile"),
     path("posts", views.Posts.as_view(), name="posts"),
-    path("posts/<str:username>", views.Posts.as_view(), name="posts"),
+    path(
+        "posts/<str:filter_name>/<str:filter_arg>", views.Posts.as_view(), name="posts"
+    ),
+    path("following", views.Following.as_view(), name="following"),
+    path(
+        "following/<str:following_username>",
+        views.Following.as_view(),
+        name="following_user",
+    ),
 ]

@@ -21,7 +21,7 @@ class Post(models.Model):
             "user": self.user.username,
             "content": self.content,
             "edited": self.edited,
-            "id": self.pk
+            "id": self.pk,
         }
 
     def __str__(self) -> str:
@@ -29,14 +29,20 @@ class Post(models.Model):
 
 
 class Likes(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="LiskesUsesr")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="LikesUser")
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="LikedPost")
 
+    def __str__(self) -> str:
+        return f"User {self.user} like post {self.post}"
 
-class Fallowing(models.Model):
-    fallower = models.ForeignKey(
+
+class Following(models.Model):
+    follower = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="Follower"
     )
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="FallowingUser"
+        User, on_delete=models.CASCADE, related_name="FollowingUser"
     )
+
+    def __str__(self) -> str:
+        return f"user {self.follower} Fallwoing {self.user}"
