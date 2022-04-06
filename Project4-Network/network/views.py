@@ -29,6 +29,7 @@ class Posts(View):
         for post in current_page.object_list:
             current_post = post.serialize()
             current_post["likes"] = post.LikedPost.count()
+            current_post["owner"] = post.user.id == request.user.id
             results["results"].append(current_post)
 
         results["paginator"] = {

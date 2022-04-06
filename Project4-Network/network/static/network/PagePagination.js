@@ -24,7 +24,7 @@ export class PagePagination extends HTMLElement {
 
     createArrow(next = false) {
         const li = document.createElement("li");
-        li.className = "post-item";
+        li.className = "page-item";
         const span = document.createElement("span");
         span.className = "page-link";
 
@@ -49,7 +49,9 @@ export class PagePagination extends HTMLElement {
 
         this.paginator.page_list.forEach(page_no => {
             const li = document.createElement("li");
-            li.className = "post-item";
+            li.className = "page-item";
+            if (this.paginator.page === page_no)
+                li.classList.add("active");
             const span = document.createElement("span");
             span.className = "page-link";
             span.dataset.page = page_no;

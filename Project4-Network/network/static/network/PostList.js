@@ -28,9 +28,6 @@ export class PostList extends HTMLElement {
         }
     }
 
-    async getData() {
-    }
-
     handlePageChange(page) {
         this.setAttribute("page", page);
     }
@@ -41,6 +38,21 @@ export class PostList extends HTMLElement {
             this.render();
             console.log('render');
         });
+
+        this.addEventListener("click", (ev) => this.handleClickEvent(ev));
+    }
+
+    handleClickEvent(ev) {
+        switch( ev.target.getAttribute("data-id")) {
+            case "edit-btn":
+                console.log("edit");
+                break;
+            case "like-btn":
+                console.log("like");
+                break;
+            default:
+                console.log(ev.target);
+        }
     }
 
     async render() {

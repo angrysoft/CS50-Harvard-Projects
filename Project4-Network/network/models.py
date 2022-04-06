@@ -21,6 +21,7 @@ class Post(models.Model):
             "user": self.user.username,
             "content": self.content,
             "edited": self.edited,
+            "id": self.pk
         }
 
     def __str__(self) -> str:

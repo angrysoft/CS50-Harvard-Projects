@@ -55,3 +55,53 @@ body {
     display: grid;
     gap: 0.5rem;
 }
+
+.like {
+    display: flex;
+    align-items: center;
+}
+
+.like__icon {
+    color: red;
+    font-size: 1.5rem;
+}
+
+.like__number {
+    font-size: 1.5rem;
+}
+
+.like__icon, .like__number {
+    padding: 0.5rem;
+}
+
+.like__icon {
+    background-color: red;
+    display: inline-block;
+    height: 1rem;
+    margin: 0 0.5rem;
+    position: relative;
+    top: 0;
+    transform: rotate(-45deg);
+    width: 1rem;
+    cursor: pointer;
+  }
+  
+  .like__icon:before,
+  .like__icon:after {
+    content: "";
+    background-color: red;
+    border-radius: 50%;
+    height: 1rem;
+    position: absolute;
+    width: 1rem;
+  }
+  
+  .like__icon:before {
+    top: -0.5rem;
+    left: 0;
+  }
+  
+  .like__icon:after {
+    left: 0.5rem;
+    top: 0;
+  }
