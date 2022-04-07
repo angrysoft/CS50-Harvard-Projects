@@ -52,9 +52,11 @@ export class PagePagination extends HTMLElement {
             li.className = "page-item";
             if (this.paginator.page === page_no)
                 li.classList.add("active");
-            const span = document.createElement("span");
-            span.className = "page-link";
-            span.dataset.page = page_no;
+                const span = document.createElement("span");
+                span.className = "page-link";
+                if (page_no != "…") {
+                    span.dataset.page = page_no;
+                }
             span.textContent = page_no.toString();
             li.appendChild(span);
             ul.appendChild(li);

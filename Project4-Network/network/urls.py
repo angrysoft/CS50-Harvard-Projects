@@ -12,10 +12,5 @@ urlpatterns = [
     path(
         "posts/<str:filter_name>/<str:filter_arg>", views.Posts.as_view(), name="posts"
     ),
-    path("following", views.Following.as_view(), name="following"),
-    path(
-        "following/<str:following_username>",
-        views.Following.as_view(),
-        name="following_user",
-    ),
+    path("following", views.following, name="following"),
 ]

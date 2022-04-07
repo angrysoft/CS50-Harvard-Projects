@@ -44,7 +44,7 @@ class Posts(View):
 
         results["paginator"] = {
             "page_list": list(
-                current_page.paginator.get_elided_page_range(current_page.number)
+                current_page.paginator.get_elided_page_range(current_page.number, on_each_side=1, on_ends=1)
             ),
             "has_previous": current_page.has_previous(),
             "has_next": current_page.has_next(),
@@ -108,21 +108,12 @@ def index(request: HttpRequest):
     )
 
 
-def user_profile(request: HttpRequest, username: str):
-    user_profile = User.objects.get(username__exact=username)
-    return render(
-        request,
-        "network/profile.html",
-        {
-            "profile": user_profile,
-        },
-    )
+class ProfileView(View):
+    def get(self, request: HttpRequest, username: str):
+        user = User.objects.get(username__exact=username)
+        user_profile = user.serialize()
 
-
-class Following(View):
-    @method_decorator(login_required)
-    def get(self, request: HttpRequest):
-        return render(request, "network/following.html")
+        return JsonResponse(user_profile)
 
     @method_decorator(login_required)
     def post(self, request: HttpRequest, following_username: str):
@@ -130,10 +121,15 @@ class Following(View):
         following_user = get_object_or_404(User, username=following_username)
         following_users = [f.user for f in user.Follower.all()]
         if following_username in following_users:
-            Following.objec
-        following = Following()
-        following.fallower = user
-        following.user = following_user
+            Following.objects.filter(follower__exact=user, user__exact=following_user)
+        else:
+            following = Following()
+            following.follower = user
+            following.user = following_user
+
+
+def following(request: HttpRequest):
+    return render(request, "network/following.html")
 
 
 def login_view(request: HttpRequest):

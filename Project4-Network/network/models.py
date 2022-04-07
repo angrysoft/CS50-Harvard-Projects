@@ -45,4 +45,4 @@ class Following(models.Model):
     )
 
     def __str__(self) -> str:
-        return f"user {self.follower} Fallwoing {self.user}"
+        return f"user {self.follower} Following {self.user}"
