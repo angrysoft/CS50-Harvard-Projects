@@ -32,10 +32,6 @@ export class PostItem extends HTMLElement {
         this.cardText.replaceWith(textArea);
     }
 
-    reloadPost(postId) {
-
-    }
-
     connectedCallback() {
         this.render();
     }

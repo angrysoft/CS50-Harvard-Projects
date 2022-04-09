@@ -1,5 +1,4 @@
 import json
-import re
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
@@ -44,7 +43,9 @@ class Posts(View):
 
         results["paginator"] = {
             "page_list": list(
-                current_page.paginator.get_elided_page_range(current_page.number, on_each_side=1, on_ends=1)
+                current_page.paginator.get_elided_page_range(
+                    current_page.number, on_each_side=1, on_ends=1
+                )
             ),
             "has_previous": current_page.has_previous(),
             "has_next": current_page.has_next(),
@@ -73,7 +74,8 @@ class Posts(View):
                 raise PermissionDenied
 
             user = User.objects.get(pk=request.user.id)
-            following_users = [f.user for f in user.Follower.all()]
+            following_users = [f.follows for f in user.Follows.all()]
+            print(following_users)
             posts = posts.filter(user__username__in=following_users)
         return posts
 
@@ -108,24 +110,40 @@ def index(request: HttpRequest):
     )
 
 
-class ProfileView(View):
+class UserProfile(View):
     def get(self, request: HttpRequest, username: str):
         user = User.objects.get(username__exact=username)
         user_profile = user.serialize()
+        user_profile["fallowing"] = user.Follows.count()
+        user_profile["fallower"] = user.Follower.count()
+        user_profile["owner"] = user.id == request.user.id
+        user_profile["is_followed"] = Following.objects.filter(
+            follower__id=request.user.id, follows_id=user.id
+        ).exists()
 
         return JsonResponse(user_profile)
 
     @method_decorator(login_required)
-    def post(self, request: HttpRequest, following_username: str):
+    def put(self, request: HttpRequest, following_username: str):
         user = get_object_or_404(User, pk=request.user.id)
         following_user = get_object_or_404(User, username=following_username)
-        following_users = [f.user for f in user.Follower.all()]
-        if following_username in following_users:
-            Following.objects.filter(follower__exact=user, user__exact=following_user)
+        is_follwing = Following.objects.filter(
+            follower__id=user.id, follows_id=following_user.id
+        ).exists()
+        if is_follwing:
+            Following.objects.filter(
+                follower__id=user.id, follows_id=following_user.id
+            ).delete()
         else:
             following = Following()
             following.follower = user
-            following.user = following_user
+            following.follows = following_user
+
+
+def profile(request: HttpRequest, username: str):
+    return render(
+        request, "network/profile.html", {"profile_username": username}
+    )
 
 
 def following(request: HttpRequest):

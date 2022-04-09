@@ -10,7 +10,7 @@ usernames = [
 ]
 
 for username in usernames:
-    user = User.objects.create_user(username, f'{username}@bar.net', '1234')
+    user = User.objects.create_user(username, f"{username}@bar.net", "1234")
     user.save()
 
 for no in range(100):
@@ -19,6 +19,8 @@ for no in range(100):
     )
     post = Post()
     post.content = r.text
-    post.user = User.objects.get(username__exact=(usernames[randint(0, len(usernames)-1)]))
+    post.user = User.objects.get(
+        username__exact=(usernames[randint(0, len(usernames) - 1)])
+    )
     post.save()
     print(f"added Post no : {no}")

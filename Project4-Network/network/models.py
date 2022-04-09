@@ -37,12 +37,8 @@ class Likes(models.Model):
 
 
 class Following(models.Model):
-    follower = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="Follower"
-    )
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="FollowingUser"
-    )
+    follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name="Follows")
+    follows = models.ForeignKey(User, on_delete=models.CASCADE, related_name="Follower")
 
     def __str__(self) -> str:
-        return f"user {self.follower} Following {self.user}"
+        return f"user {self.follower} Following {self.follows}"
