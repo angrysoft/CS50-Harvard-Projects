@@ -1,3 +1,6 @@
+import { getCookie } from "./utils.js";
+
+
 export class UserInfo extends HTMLElement {
     constructor() {
         super();
@@ -12,36 +15,55 @@ export class UserInfo extends HTMLElement {
         const userProfileData = await this.getData();
         this.innerHTML = "";
         this.className = "card";
-
+        console.log(userProfileData);
         const cartBody = document.createElement("div");
         cartBody.className = 'card-body';
 
         const cardTitle = document.createElement("h5");
         cardTitle.className = "card-title";
         cardTitle.textContent = this.username;
-        this.appendChild(cardTitle);
+        cartBody.appendChild(cardTitle);
         
-        if (! userProfileData["owner"]) {
+        if (! userProfileData["owner"] && userProfileData.authenticated) {
             const followBtn = document.createElement("button");
             followBtn.className = "btn btn-primary";
-            fallowBtn.textContent = userProfileData.is_followed ? "Unfollow" : "Follow"
-            this.appendChild(followBtn);
+            followBtn.textContent = userProfileData.is_followed ? "Unfollow" : "Follow"
+            cartBody.appendChild(followBtn);
+            followBtn.addEventListener('click', async (ev)=> this.toggleFollow());
+
         }
 
         const following = document.createElement("h5");
-        following.textContent = "User Follows ";
+        following.textContent = "User Follows: ";
         const followingBadge = document.createElement("span");
         followingBadge.className = "badge bg-primary";
         followingBadge.textContent = userProfileData.following;
-        this.appendChild(following);
+        following.appendChild(followingBadge);
+        cartBody.appendChild(following);
 
         const followers = document.createElement("h5");
         followers.textContent = "Follower ";
         const followersBadge = document.createElement("span");
         followersBadge.className = "badge bg-primary";
         followersBadge.textContent = userProfileData.followers;
-        this.appendChild(followers);
+        followers.appendChild(followersBadge);
+        cartBody.appendChild(followers);
 
+        this.appendChild(cartBody);
+
+    }
+
+    async toggleFollow(ev) {
+        let url = `/user_profile/${this.username}`;
+        const csrftoken = getCookie('csrftoken');
+        const headers = {'X-CSRFToken': csrftoken}
+        const response = await fetch(url, {
+            method: "PUT",
+            headers: headers
+        });
+        if (response.ok) {
+            await this.render();
+        }
     }
 
     static get observedAttributes() { return ['user']; }

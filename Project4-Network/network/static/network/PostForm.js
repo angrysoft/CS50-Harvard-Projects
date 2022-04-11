@@ -21,18 +21,12 @@ export class PostForm extends HTMLElement {
         const formData = new FormData(this.form);
         const data = {}
         data["content"] = formData.get("content");
-        let method = "POST";
         const csrftoken = getCookie('csrftoken');
         const headers = {'X-CSRFToken': csrftoken}
-        
-        if (this.getAttribute("action") === "update") {
-            method = "PUT";
-            data["post_id"] = this.getAttribute("post_id");
-        }
 
-        const response = await fetch("/posts", {
+        const response = await fetch("/post", {
             body: JSON.stringify(data),
-            method: method,
+            method: "POST",
             headers: headers,
             mode: "same-origin"
         });

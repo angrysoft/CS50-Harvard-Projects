@@ -7,7 +7,6 @@ class User(AbstractUser):
     def serialize(self) -> Dict[str, Any]:
         return {
             "username": self.username,
-            "authenticated": self.is_authenticated,
         }
 
 

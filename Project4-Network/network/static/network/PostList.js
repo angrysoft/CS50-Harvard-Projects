@@ -50,20 +50,6 @@ export class PostList extends HTMLElement {
             console.log('render');
         });
 
-        this.addEventListener("click", (ev) => this.handleClickEvent(ev));
-    }
-
-    handleClickEvent(ev) {
-        switch( ev.target.getAttribute("data-id")) {
-            case "edit-btn":
-                console.log("edit");
-                break;
-            case "like-btn":
-                console.log("like");
-                break;
-            default:
-                console.log(ev.target);
-        }
     }
 
     async getData() {
@@ -83,7 +69,7 @@ export class PostList extends HTMLElement {
         this.innerHTML = '';
         const posts = await this.getData();
         posts.results.forEach(post => {
-            this.postsWrapper.appendChild(new PostItem(post));
+            this.postsWrapper.appendChild(new PostItem(post, ));
         });
 
         this.appendChild(this.postsWrapper);
