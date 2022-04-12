@@ -1,4 +1,5 @@
 import json
+from typing import Any, Dict
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
@@ -54,24 +55,25 @@ class Posts(View):
         filter_name: str | None = None,
         filter_arg: str | None = None,
     ):
-        user_id: int = request.user.id
-        page_no: int = int(request.GET.get("page", 1))
         posts = self.getPosts(request, filter_name, filter_arg)
-        items: int = int(request.GET.get("items", 10))
-        results = self.getResults(posts, user_id, page_no, items)
+        results = self.getResults(posts, request)
 
         return JsonResponse(results)
 
-    def getResults(self, posts, user_id, page_no, items):
+    def getResults(self, posts, request: HttpRequest) -> Dict[str, Any]:
+        user_id: int = request.user.id
+        page_no: int = int(request.GET.get("page", 1))
+        items: int = int(request.GET.get("items", 10))
+
         paginator = Paginator(posts.all(), per_page=items, allow_empty_first_page=True)
         current_page: Page = paginator.get_page(page_no)
-        results = {}
+        results: Dict[str, Any] = {}
         results["results"] = []
         for post in current_page.object_list:
             current_post = post.serialize()
             current_post["likes"] = post.LikedPost.count()
             current_post["owner"] = post.user.id == user_id
-
+            current_post["authenticated"] = request.user.is_authenticated
             results["results"].append(current_post)
 
         results["paginator"] = {
@@ -98,7 +100,7 @@ class Posts(View):
             pass
         return results
 
-    def getPosts(self, request, filter_name, filter_arg):
+    def getPosts(self, request: HttpRequest, filter_name: str, filter_arg: str):
         posts = Post.objects.order_by("-edited")
         if filter_name == "username":
             posts = posts.filter(user__username__exact=filter_arg)
@@ -121,14 +123,14 @@ def likes(request: HttpRequest, post_id: int):
             like = Likes.objects.get(user__id=request.user.id, post__id=post_id)
             like.delete()
         except ObjectDoesNotExist:
-            if (post.user != request.user):
+            if post.user != request.user:
                 Likes.objects.create(user=request.user, post=post)
             else:
                 return HttpResponse("owner")
 
         return HttpResponse("ok")
 
-    likes_count:int = post.LikedPost.count()
+    likes_count: int = post.LikedPost.count()
     return HttpResponse(likes_count)
 
 

@@ -47,7 +47,6 @@ export class PostList extends HTMLElement {
         await this.render();
         document.addEventListener("posts-changed", ()=>{
             this.render();
-            console.log('render');
         });
 
     }

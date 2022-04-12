@@ -13,7 +13,6 @@ export class PagePagination extends HTMLElement {
 
     connectedCallback() {
         this.addEventListener("click", (el) => {
-            console.log(el.target);
             el.preventDefault();
             if (el.target.hasAttribute("data-page"))
                 this.pageChange(el.target.getAttribute("data-page"));

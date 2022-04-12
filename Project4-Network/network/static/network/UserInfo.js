@@ -15,7 +15,6 @@ export class UserInfo extends HTMLElement {
         const userProfileData = await this.getData();
         this.innerHTML = "";
         this.className = "card";
-        console.log(userProfileData);
         const cartBody = document.createElement("div");
         cartBody.className = 'card-body';
 

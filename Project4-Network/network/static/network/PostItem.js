@@ -72,7 +72,8 @@ export class PostItem extends HTMLElement {
     }
 
     async toggleLike(ev) {
-        
+        if (! this.post.authenticated)
+            return;
         const csrftoken = getCookie('csrftoken');
         const headers = {'X-CSRFToken': csrftoken}
         try {
@@ -85,7 +86,6 @@ export class PostItem extends HTMLElement {
                 const likeResponse = await fetch(`/likes/${this.post.id}`);
                 if (likeResponse.ok) {
                     this.post.likes = await likeResponse.text();
-                    console.log(this.post.likes);
                     this.render();
                 }
             }
