@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import csv
 import sys
 
@@ -64,12 +62,10 @@ def main():
     load_data(directory)
     print("Data loaded.")
 
-    # source = person_id_for_name(input("Name: "))
-    source = person_id_for_name("Kevin Bacon")
+    source = person_id_for_name(input("Name: "))
     if source is None:
         sys.exit("Person not found.")
-    # target = person_id_for_name(input("Name: "))
-    target = person_id_for_name("Tom Cruise")
+    target = person_id_for_name(input("Name: "))
     if target is None:
         sys.exit("Person not found.")
 
@@ -95,14 +91,31 @@ def shortest_path(source, target):
 
     If no possible path, returns None.
     """
-    print(source, target)
     start = Node(state=source, parent=None, action=None)
-    frontier = StackFrontier()
+    frontier = QueueFrontier()
     frontier.add(start)
-    exlored = set()
-    for n in neighbors_for_person("102"):
-        print(n)
-    return None
+    explored = set()
+    result = None
+
+    while not frontier.empty():
+        node = frontier.remove()
+
+        if node.state == target:
+            result = []
+            while node.parent is not None:
+                result.append((node.action, node.state))
+                node = node.parent
+            result.reverse()
+            break
+
+        explored.add(node.state)
+
+        # action movie_id, state actor_id
+        for action, state in neighbors_for_person(node.state):
+            if not frontier.contains_state(node.state) and state not in explored:
+                child = Node(state=state, parent=node, action=action)
+                frontier.add(child)
+    return result
 
 
 def person_id_for_name(name):
