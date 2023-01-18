@@ -41,11 +41,10 @@ def actions(board):
     Returns set of all possible actions (i, j) available on the board.
     """
     empty_set = set()
-    for row in board:
-        for cell in row:
-            if cell is EMPTY:
+    for row in range(3):
+        for cell in range(3):
+            if board[row][cell] is EMPTY:
                 empty_set.add((row, cell))
-    print(empty_set)
     return empty_set
 
 
@@ -72,20 +71,73 @@ def terminal(board):
     """
     Returns True if game is over, False otherwise.
     """
-    if not actions():
-        
-    return False
+    result = False
+    if not actions(board):
+        result = True
+
+    return result
 
 
 def utility(board):
     """
     Returns 1 if X has won the game, -1 if O has won, 0 otherwise.
     """
-    raise NotImplementedError
+    p = {"X": 1, "O": -1}
+    if v := chekc_row(board):
+        return p[v]
+
+    if v := check_col(board):
+        return p[v]
+
+    if v := check_x(board):
+        return p[v]
+    return 0
+
+
+def check_x(board):
+    if (
+        board[0][0] == board[1][1] == board[2][2]
+        or board[2][0] == board[1][1] == board[0][2]
+        and board[0][0] is not None
+    ):
+        return board[1][1]
+
+
+def check_col(board):
+    for i in range(3):
+        if board[0][i] == board[1][i] == board[2][i] and board[0][i] is not None:
+            return board[0][i]
+
+
+def chekc_row(board):
+    for a, b, c in board:
+        if a == b == c and a is not None:
+            return a
 
 
 def minimax(board):
     """
     Returns the optimal action for the current player on the board.
     """
-    raise NotImplementedError
+    if player(board) == O:
+        return min_value(board)
+    return max_value(board)
+
+
+def max_value(state) -> float:
+    # if terminal(state):
+    #     return utility(state)
+    v = -math.inf
+    for action in actions(state):
+        v = max(v, min_value(result(state, action)))
+    return v
+
+
+def min_value(state) -> float:
+    # if terminal(state):
+    #     return utility(state)
+    v = math.inf
+    for action in actions(state):
+        v = min(v, max_value(result(state, action)))
+
+    return v
