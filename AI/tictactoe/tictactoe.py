@@ -64,7 +64,8 @@ def winner(board):
     """
     Returns the winner of the game, if there is one.
     """
-    raise NotImplementedError
+    winner = {1: X, -1: O}
+    return winner.get(utility(board))
 
 
 def terminal(board):
@@ -72,7 +73,7 @@ def terminal(board):
     Returns True if game is over, False otherwise.
     """
     result = False
-    if not actions(board):
+    if not actions(board) or utility(board) != 0:
         result = True
 
     return result
@@ -119,25 +120,42 @@ def minimax(board):
     """
     Returns the optimal action for the current player on the board.
     """
+    current_action_max = (-1, -1)
+    current_action_min = (-1, -1)
+
+    def max_value(state) -> float:
+        nonlocal current_action_max
+        if terminal(state):
+            return utility(state)
+        last_v = -math.inf
+        v = -math.inf
+        for action in actions(state):
+            v = max(v, min_value(result(state, action)))
+
+            if last_v != v:
+                last_v = v
+                current_action_max = action
+        return v
+
+    def min_value(state) -> float:
+        nonlocal current_action_min
+        if terminal(state):
+            return utility(state)
+        last_v = math.inf
+        v = math.inf
+        for action in actions(state):
+            v = min(v, max_value(result(state, action)))
+
+            if last_v != v:
+                last_v = v
+                current_action_min = action
+        return v
+
     if player(board) == O:
-        return min_value(board)
-    return max_value(board)
-
-
-def max_value(state) -> float:
-    # if terminal(state):
-    #     return utility(state)
-    v = -math.inf
-    for action in actions(state):
-        v = max(v, min_value(result(state, action)))
-    return v
-
-
-def min_value(state) -> float:
-    # if terminal(state):
-    #     return utility(state)
-    v = math.inf
-    for action in actions(state):
-        v = min(v, max_value(result(state, action)))
-
-    return v
+        print("Gram", O)
+        print(min_value(board), current_action_min)
+        return current_action_min
+    else:
+        print("Gram", X)
+        print(max_value(board), current_action_max)
+        return current_action_max
