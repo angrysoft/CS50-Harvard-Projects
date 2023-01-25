@@ -120,42 +120,40 @@ def minimax(board):
     """
     Returns the optimal action for the current player on the board.
     """
-    current_action_max = (-1, -1)
-    current_action_min = (-1, -1)
 
     def max_value(state) -> float:
-        nonlocal current_action_max
         if terminal(state):
-            return utility(state)
+            return (utility(state), None)
         last_v = -math.inf
         v = -math.inf
         for action in actions(state):
-            v = max(v, min_value(result(state, action)))
+            v = max(v, min_value(result(state, action))[0])
 
             if last_v != v:
                 last_v = v
                 current_action_max = action
-        return v
+        return (v, current_action_max)
 
     def min_value(state) -> float:
-        nonlocal current_action_min
+        alpha = -2
+        beta = 2
         if terminal(state):
-            return utility(state)
+            return (utility(state), None)
         last_v = math.inf
         v = math.inf
         for action in actions(state):
-            v = min(v, max_value(result(state, action)))
+            min_v, _action = max_value(result(state, action))
+            v = min(v, min_v)
 
             if last_v != v:
                 last_v = v
                 current_action_min = action
-        return v
+            
+        return (v, current_action_min)
 
     if player(board) == O:
-        print("Gram", O)
-        print(min_value(board), current_action_min)
-        return current_action_min
+        _, new_action = min_value(board)
+        return new_action
     else:
-        print("Gram", X)
-        print(max_value(board), current_action_max)
-        return current_action_max
+        _, new_action = max_value(board)
+        return new_action
